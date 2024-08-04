@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "discord-interactions-py"
+version = "0.1.0"
+description = ""
+authors = ["BeeMoe5 <48176165+BeeMoe5@users.noreply.github.com>"]
+readme = "README.md"
+# packages = [{include = "wall_e"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = {extras = ["all"], version = "^0.111.1"}
+aiohttp = "^3.9.5"
+pynacl = "^1.5.0"
+numpy = "^2.0.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
