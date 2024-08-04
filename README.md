@@ -6,7 +6,7 @@ While the `tests` directory is me testing and random stuff, you can use it as a 
 will still provide examples below
 
 # Setup
-You'll need to 
+You'll need to make a .env file with APP_ID, APP_PUBKEY, and APP_TOKEN keys in it. You get the values from discord dev portal
 # Usage
 First, you'll want to set up the HTTP Middleware:
 ```python
