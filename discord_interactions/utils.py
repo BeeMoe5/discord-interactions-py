@@ -1,48 +1,9 @@
 import os
-from fastapi import Request, HTTPException
 import aiohttp
-import nacl.signing
-import nacl.utils
-import nacl.encoding
-import nacl.public
-import nacl.exceptions
-from nacl.signing import VerifyKey
 from .models import EmbedModel, ContentModel
 
+
 _commands = []
-
-
-def verify_key(
-    body: str, signature: str, timestamp, client_public_key: str
-) -> dict | None:
-    """
-    Use this to verify that the incoming request is from discord
-
-    Parameters
-    ----------
-    body : str
-        The decoded request body
-    signature : str
-        The signature given from discord
-    timestamp : str
-        The timestamp given from discord
-    client_public_key : str
-        The public key of your discord app
-
-    Returns
-    -------
-    dict
-        If dict is returned, the request is not verified to be discord. You'll want to return this as a response
-    None
-        If None is returned, there is nothing to be worried about, and you can continue processing the request/response
-    """
-    verify_key = VerifyKey(bytes.fromhex(client_public_key))
-    smessage = f"{timestamp}{body}".encode()
-
-    try:
-        verify_key.verify(smessage, bytes.fromhex(signature))
-    except nacl.exceptions.BadSignatureError:
-        return {"status": 401, "body": "Bad request signature"}
 
 
 async def discord_request(endpoint: str, **request_options) -> aiohttp.ClientResponse:
@@ -144,24 +105,3 @@ def command(name: str = None):
         _commands.append(command_obj)
 
     return dec
-
-
-async def verify_incoming_requests(request: Request, call_next):
-    """
-    HTTP Middleware for starlette/fastapi to verify the requests are coming from discord
-    """
-
-    client_key = os.getenv("APP_PUBKEY")
-    signature = request.headers.get("X-Signature-Ed25519")
-    timestamp = request.headers.get("X-Signature-Timestamp")
-    body = await request.body()
-
-    is_valid_request = verify_key(
-        body.decode("utf-8"), signature, timestamp, client_key
-    )
-
-    if is_valid_request is None:  # successfully verified
-        resp = await call_next(request)
-        return resp
-    else:  # unsuccessfully unverified
-        raise HTTPException(is_valid_request["status"], is_valid_request["body"])

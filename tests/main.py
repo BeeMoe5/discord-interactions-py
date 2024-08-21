@@ -7,7 +7,6 @@ import uvicorn
 from discord_interactions import (
     register_commands,
     process_commands,
-    verify_incoming_requests,
     command,
 )
 from discord_interactions.models import (
@@ -17,11 +16,13 @@ from discord_interactions.models import (
     ThumbnailEmbedModel,
     InteractionType,
 )
+from discord_interactions.middleware import VerifyIncomingRequestsMiddleware
+
 
 app = FastAPI()
 load_dotenv()
 
-app.add_middleware(BaseHTTPMiddleware, dispatch=verify_incoming_requests)
+app.add_middleware(VerifyIncomingRequestsMiddleware)
 
 
 @app.post("/interactions")
